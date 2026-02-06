@@ -1,5 +1,6 @@
 import argparse
 import os
+import multiprocessing
 
 from RawProcessing import RawProcessing
 
@@ -32,12 +33,13 @@ def replace_extension_with_jpg(file_path):
     return f"{base_name}"
 
 
-def process_file(filename, source, target):
+def process_file(params):
+    filename, source, target, settings = params
     file = os.path.join(source, filename)
     print(f"Processing file: {file}")
-    photo = RawProcessing(file_directory=file, default_settings=default_settings, global_settings=default_settings, config_path=None)
-    photo.class_parameters['filetype'] = default_settings['filetype']
-    photo.class_parameters['tiff_compression'] = default_settings['tiff_compression']
+    photo = RawProcessing(file_directory=file, default_settings=settings, global_settings=settings, config_path=None)
+    photo.class_parameters['filetype'] = settings['filetype']
+    photo.class_parameters['tiff_compression'] = settings['tiff_compression']
     photo.load(full_res=True)
     photo.process(full_res=True)
     base_name, _ = os.path.splitext(filename)
@@ -49,6 +51,7 @@ if __name__ == "__main__":
     parser.add_argument("source", help="Path to the source dir")
     parser.add_argument("target", help="Path to the target dir")
     parser.add_argument("--film_type", type=int, help="0 - B/W, 1 - color negative, 2 - slide, 3 - crop only")
+    parser.add_argument("--filetype",  help="JPG/TIFF")
     parser.add_argument("--border_crop", type=int, help="border crop (can be negative)")
     parser.add_argument("--convert_bw", action=argparse.BooleanOptionalAction, help="Convert to B/W")
     parser.add_argument("--rotation", type=int, help="0 - no rotation, 1 - 90 counterclockwise, 2 - 180, 3 - 90 clockwise")
@@ -58,6 +61,12 @@ if __name__ == "__main__":
     # merge settings
     default_settings = default_settings | defined_args
 
-    for dirpath, dirnames, filenames in os.walk(args.source):
-        for filename in filenames:
-            process_file(filename, dirpath, args.target)
+    #for dirpath, dirnames, filenames in os.walk(args.source):
+    #    for filename in filenames:
+    #        process_file([filename, dirpath, args.target, default_settings])
+
+    with multiprocessing.Manager() as manager:
+        with multiprocessing.Pool(4) as pool:
+            for dirpath, dirnames, filenames in os.walk(args.source):
+                params = [[f, dirpath, args.target, default_settings] for f in filenames]
+                pool.map(process_file, params)
