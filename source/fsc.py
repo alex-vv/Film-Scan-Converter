@@ -7,7 +7,7 @@ default_settings = dict(
     film_type = 3,
     dark_threshold = 0,
     light_threshold = 83,
-    border_crop = -1,
+    border_crop = 1,
     flip = True,
     white_point = 0,
     black_point = 0,
@@ -47,9 +47,14 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("source", help="Path to the source dir")
     parser.add_argument("target", help="Path to the target dir")
+    parser.add_argument("--film_type", type=int, help="0 - B/W, 1 - color negative, 2 - slide, 3 - crop only")
+    parser.add_argument("--border_crop", type=int, help="border crop (can be negative)")
     parser.add_argument("--convert_bw", action=argparse.BooleanOptionalAction, help="Convert to B/W")
     args = parser.parse_args()
-    default_settings['convert_bw'] = args.convert_bw
+    defined_args = {k:v for k,v in args._get_kwargs() if v is not None and k not in {'source', 'target'}}
+
+    # merge settings
+    default_settings = default_settings | defined_args
 
     for dirpath, dirnames, filenames in os.walk(args.source):
         for filename in filenames:
