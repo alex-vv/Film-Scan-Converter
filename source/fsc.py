@@ -21,7 +21,8 @@ default_settings = dict(
     base_rgb = (255, 255, 255),
     remove_dust = False,
     filetype = 'TIFF',
-    tiff_compression = 1 
+    tiff_compression = 1,
+    convert_bw = False
 )
 
 # Function to create new filename
@@ -46,7 +47,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("source", help="Path to the source dir")
     parser.add_argument("target", help="Path to the target dir")
+    parser.add_argument("--convert_bw", action=argparse.BooleanOptionalAction, help="Convert to B/W")
     args = parser.parse_args()
+    default_settings['convert_bw'] = args.convert_bw
 
     for dirpath, dirnames, filenames in os.walk(args.source):
         for filename in filenames:

@@ -42,7 +42,7 @@ class RawProcessing:
     )
     class_parameters = default_parameters.copy()
     advanced_attrs = [key for key in default_parameters.keys() if key not in ('filetype', 'frame', 'fit_aspect_ratio')] # list of keys for advanced settings, except for keys that should not be saved
-    processing_parameters = ('dark_threshold','light_threshold','border_crop','flip','rotation','film_type','white_point','black_point','gamma','shadows','highlights','temp','tint','sat','reject','base_detect','base_rgb','remove_dust')
+    processing_parameters = ('dark_threshold','light_threshold','border_crop','flip','rotation','film_type','white_point','black_point','gamma','shadows','highlights','temp','tint','sat','reject','base_detect','base_rgb','remove_dust','convert_bw')
     
     def __init__(self, file_directory, default_settings, global_settings, config_path):
         # file_directory: the name of the RAW file to be processed
@@ -298,7 +298,8 @@ class RawProcessing:
         return img
         
     def crop_only(self, img):
-        # No processing required
+        if self.convert_bw:
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) # converts to b/w
         return img
     
     def find_dust(self, img):
