@@ -22,7 +22,8 @@ default_settings = dict(
     remove_dust = False,
     filetype = 'TIFF',
     tiff_compression = 1,
-    convert_bw = False
+    convert_bw = False,
+    rotation = 0
 )
 
 # Function to create new filename
@@ -50,6 +51,7 @@ if __name__ == "__main__":
     parser.add_argument("--film_type", type=int, help="0 - B/W, 1 - color negative, 2 - slide, 3 - crop only")
     parser.add_argument("--border_crop", type=int, help="border crop (can be negative)")
     parser.add_argument("--convert_bw", action=argparse.BooleanOptionalAction, help="Convert to B/W")
+    parser.add_argument("--rotation", type=int, help="0 - no rotation, 1 - 90 counterclockwise, 2 - 180, 3 - 90 clockwise")
     args = parser.parse_args()
     defined_args = {k:v for k,v in args._get_kwargs() if v is not None and k not in {'source', 'target'}}
 
