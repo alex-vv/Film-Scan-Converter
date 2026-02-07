@@ -7,7 +7,7 @@ from RawProcessing import RawProcessing
 default_settings = dict(
     film_type = 3,
     dark_threshold = 0,
-    light_threshold = 83,
+    light_threshold = 85,
     border_crop = 1,
     flip = True,
     white_point = 0,
@@ -68,5 +68,5 @@ if __name__ == "__main__":
     with multiprocessing.Manager() as manager:
         with multiprocessing.Pool(4) as pool:
             for dirpath, dirnames, filenames in os.walk(args.source):
-                params = [[f, dirpath, args.target, default_settings] for f in filenames]
+                params = [[f, dirpath, args.target, default_settings] for f in sorted(filenames)]
                 pool.map(process_file, params)
