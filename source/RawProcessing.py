@@ -61,7 +61,8 @@ class RawProcessing:
             directory = os.path.join(self.config_path, f"{self.filename.split('.')[0]}.npy")
             params_dict = np.load(directory, allow_pickle=True).item()
         except Exception as e:# file does not exist
-            logger.exception(f'Exception: {e}')
+            if config_path is not None:
+                logger.exception(f'Exception: {e}')
             for attr in self.processing_parameters:
                 if attr in global_settings:
                     setattr(self, attr, global_settings[attr]) # Initializes every instance parameter based on default value
