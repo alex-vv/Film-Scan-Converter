@@ -5,7 +5,7 @@ import multiprocessing
 from RawProcessing import RawProcessing
 
 default_settings = dict(
-    film_type = 3,
+    film_type = 3, # 0 - B/W, 1 - color negative, 2 - slide, 3 - crop only
     dark_threshold = 0,
     light_threshold = 85,
     border_crop = 1,
@@ -24,11 +24,23 @@ default_settings = dict(
     filetype = 'TIFF',
     tiff_compression = 1,
     convert_bw = False,
-    rotation = 0, # 0 - no rotation, 1 - 90 counterclockwise, 2 - 180, 3 - 90 clockwise
+    rotation = 2, # 0 - no rotation, 1 - 90 counterclockwise, 2 - 180, 3 - 90 clockwise
     iterative_crop = True,
     min_crop_ratio = 0.85,
     max_crop_ratio = 0.90
 )
+
+presets = {
+    'standard': {
+        'film_type': 3,
+        'rotation': 2
+    },
+    'b/w_auto': {
+        'film_type': 0,
+        'rotation': 2,
+        'filetype': 'JPG'
+    }
+}
 
 # Function to create new filename
 def replace_extension_with_jpg(file_path):
@@ -53,6 +65,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("source", help="Path to the source dir")
     parser.add_argument("target", help="Path to the target dir")
+    parser.add_argument("--preset", help=f"{list(presets.keys())}")
 
     for key, value  in default_settings.items():
         if type(value) == bool:
@@ -62,6 +75,10 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     defined_args = {k:v for k,v in args._get_kwargs() if v is not None and k not in {'source', 'target'}}
+
+    preset = defined_args['preset']
+    if preset is not None:
+        defined_args = defined_args | presets[preset]
 
     # merge settings
     default_settings = default_settings | defined_args
