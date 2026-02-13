@@ -359,23 +359,23 @@ class RawProcessing:
         y, x = self.RAW_IMG.shape[0], self.RAW_IMG.shape[1]
         if rect[2] <= 0:
             rect = ((rect[0][0], rect[0][1]), (rect[1][1], rect[1][0]), rect[2] + 90) # correction for if the rectangle rotation is exactly zero
+
+        ratio_x, ratio_y = max(rect[1][0], rect[1][1])/x, min(rect[1][0], rect[1][1])/y
         rect = ((rect[0][0]/y, rect[0][1]/x), (rect[1][0]/y, rect[1][1]/x), rect[2]) # normalizes crop for different sized images
 
-        logger.info(f"{self.filename} {rect[1]}")
-
         if self.iterative_crop:
-            if min(rect[1][0], rect[1][1]) < self.min_crop_ratio:
+            if min(ratio_x, ratio_y) < self.min_crop_ratio:
                 self.light_threshold += 1
                 logger.info(f"{self.filename} {rect[1]} wrong crop, increasing light threshold to {self.light_threshold}")
                 return self.find_optimal_crop(is_increasing = True)
 
-            if rect[1][0] > self.max_crop_ratio:
+            if max(ratio_x, ratio_y) > self.max_crop_ratio:
                 if not is_increasing:
                     self.light_threshold -= 1
                     logger.info(f"{self.filename} {rect[1]} wrong crop, decreasing light threshold to {self.light_threshold}")
                     return self.find_optimal_crop()
                 else:
-                    logger.warning(f"{self.filename} still wrong crop {rect[1]}")
+                    logger.warning(f"{self.filename} still wrong crop {(ratio_x, ratio_y)}")
                     if self.skip_wrong_crop:
                         self.film_type = 3
 

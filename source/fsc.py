@@ -9,6 +9,7 @@ default_settings = dict(
     dark_threshold = 0,
     light_threshold = 85,
     border_crop = 1,
+    ignore_border = (1, 1),
     flip = True,
     white_point = 0,
     black_point = 0,
@@ -41,7 +42,9 @@ presets = {
     },
     'b/w_auto': {
         'film_type': 0,
+        'border_crop': 3,
         'rotation': 2,
+        'ignore_border': (3, 3),
         'skip_wrong_crop': True,
         'filetype': 'JPG',
         'remove_dust': True
@@ -60,7 +63,7 @@ def process_file(params):
     print(f"Processing file: {file}")
     photo = RawProcessing(file_directory=file, default_settings=settings, global_settings=settings, config_path=None)
 
-    for key in ['filetype', 'tiff_compression', 'dust_threshold', 'max_dust_area', 'dust_iter']:
+    for key in ['filetype', 'tiff_compression', 'dust_threshold', 'max_dust_area', 'dust_iter', 'ignore_border']:
         photo.class_parameters[key] = settings[key]
 
     photo.load(full_res=True)
