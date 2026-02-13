@@ -252,7 +252,9 @@ class RawProcessing:
         else:
             img = self.RAW_IMG
 
-        dust_mask = self.find_dust(self.crop(img, self.rect))
+        dust_mask = None
+        if self.remove_dust:
+            dust_mask = self.find_dust(self.crop(img, self.rect))
 
         # Additional processing specific to each film type
         match self.film_type:
