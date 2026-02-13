@@ -21,6 +21,9 @@ default_settings = dict(
     base_detect = 0,
     base_rgb = (255, 255, 255),
     remove_dust = False,
+    dust_threshold = 10,
+    max_dust_area = 4,
+    dust_iter = 5,
     filetype = 'TIFF',
     tiff_compression = 1,
     convert_bw = False,
@@ -40,7 +43,8 @@ presets = {
         'film_type': 0,
         'rotation': 2,
         'skip_wrong_crop': True,
-        'filetype': 'JPG'
+        'filetype': 'JPG',
+        'remove_dust': True
     }
 }
 
@@ -55,8 +59,10 @@ def process_file(params):
     file = os.path.join(source, filename)
     print(f"Processing file: {file}")
     photo = RawProcessing(file_directory=file, default_settings=settings, global_settings=settings, config_path=None)
-    photo.class_parameters['filetype'] = settings['filetype']
-    photo.class_parameters['tiff_compression'] = settings['tiff_compression']
+
+    for key in ['filetype', 'tiff_compression', 'dust_threshold', 'max_dust_area', 'dust_iter']:
+        photo.class_parameters[key] = settings[key]
+
     photo.load(full_res=True)
     photo.process(full_res=True)
     base_name, _ = os.path.splitext(filename)
