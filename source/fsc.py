@@ -26,6 +26,7 @@ default_settings = dict(
     convert_bw = False,
     rotation = 2, # 0 - no rotation, 1 - 90 counterclockwise, 2 - 180, 3 - 90 clockwise
     iterative_crop = True,
+    skip_wrong_crop = False,
     min_crop_ratio = 0.85,
     max_crop_ratio = 0.90
 )
@@ -38,6 +39,7 @@ presets = {
     'b/w_auto': {
         'film_type': 0,
         'rotation': 2,
+        'skip_wrong_crop': True,
         'filetype': 'JPG'
     }
 }

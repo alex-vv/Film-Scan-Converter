@@ -42,7 +42,7 @@ class RawProcessing:
     )
     class_parameters = default_parameters.copy()
     advanced_attrs = [key for key in default_parameters.keys() if key not in ('filetype', 'frame', 'fit_aspect_ratio')] # list of keys for advanced settings, except for keys that should not be saved
-    processing_parameters = ('dark_threshold','light_threshold','border_crop','flip','rotation','film_type','white_point','black_point','gamma','shadows','highlights','temp','tint','sat','reject','base_detect','base_rgb','remove_dust','convert_bw','iterative_crop','min_crop_ratio','max_crop_ratio')
+    processing_parameters = ('dark_threshold','light_threshold','border_crop','flip','rotation','film_type','white_point','black_point','gamma','shadows','highlights','temp','tint','sat','reject','base_detect','base_rgb','remove_dust','convert_bw','iterative_crop','skip_wrong_crop','min_crop_ratio','max_crop_ratio')
     
     def __init__(self, file_directory, default_settings, global_settings, config_path):
         # file_directory: the name of the RAW file to be processed
@@ -359,16 +359,23 @@ class RawProcessing:
             rect = ((rect[0][0], rect[0][1]), (rect[1][1], rect[1][0]), rect[2] + 90) # correction for if the rectangle rotation is exactly zero
         rect = ((rect[0][0]/y, rect[0][1]/x), (rect[1][0]/y, rect[1][1]/x), rect[2]) # normalizes crop for different sized images
 
+        logger.info(f"{self.filename} {rect[1]}")
+
         if self.iterative_crop:
             if min(rect[1][0], rect[1][1]) < self.min_crop_ratio:
                 self.light_threshold += 1
                 logger.info(f"{self.filename} {rect[1]} wrong crop, increasing light threshold to {self.light_threshold}")
                 return self.find_optimal_crop(is_increasing = True)
 
-            if rect[1][0] > self.max_crop_ratio and not is_increasing:
-                self.light_threshold -= 2
-                logger.info(f"{self.filename} {rect[1]} wrong crop, decreasing light threshold to {self.light_threshold}")
-                return self.find_optimal_crop()
+            if rect[1][0] > self.max_crop_ratio:
+                if not is_increasing:
+                    self.light_threshold -= 1
+                    logger.info(f"{self.filename} {rect[1]} wrong crop, decreasing light threshold to {self.light_threshold}")
+                    return self.find_optimal_crop()
+                else:
+                    logger.warning(f"{self.filename} still wrong crop {rect[1]}")
+                    if self.skip_wrong_crop:
+                        self.film_type = 3
 
         return thresh, rect, largest_contour
     
