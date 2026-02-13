@@ -24,7 +24,10 @@ default_settings = dict(
     filetype = 'TIFF',
     tiff_compression = 1,
     convert_bw = False,
-    rotation = 0
+    rotation = 0,
+    iterative_crop = True,
+    min_crop_ratio = 0.85,
+    max_crop_ratio = 0.90
 )
 
 # Function to create new filename
