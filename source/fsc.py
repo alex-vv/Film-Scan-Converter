@@ -31,8 +31,9 @@ default_settings = dict(
     rotation = 2, # 0 - no rotation, 1 - 90 counterclockwise, 2 - 180, 3 - 90 clockwise
     iterative_crop = True,
     skip_wrong_crop = False,
-    min_crop_ratio = 0.85,
-    max_crop_ratio = 0.90
+    min_crop_ratio = 0.77,
+    max_crop_ratio = 0.90,
+    max_rotation = 3.0
 )
 
 presets = {
