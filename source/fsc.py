@@ -32,13 +32,16 @@ default_settings = dict(
     iterative_crop = True,
     skip_wrong_crop = False,
     min_crop_ratio = 0.77,
-    max_crop_ratio = 0.90,
-    max_rotation = 3.0
+    max_crop_ratio = 0.88,
+    max_rotation = 2.0
 )
 
 presets = {
     'standard': {
         'film_type': 3,
+        'border_crop': -3,
+        'ignore_border': (3, 3),
+        'remove_dust': True,
         'rotation': 2
     },
     'b/w_auto': {

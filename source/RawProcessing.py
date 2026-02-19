@@ -385,26 +385,26 @@ class RawProcessing:
         if rect[2] <= 0:
             rect = ((rect[0][0], rect[0][1]), (rect[1][1], rect[1][0]), rect[2] + 90) # correction for if the rectangle rotation is exactly zero
 
-        ratio_x, ratio_y = max(rect[1][0], rect[1][1])/x, min(rect[1][0], rect[1][1])/y
+        ratio_x, ratio_y, rotation = max(rect[1][0], rect[1][1])/x, min(rect[1][0], rect[1][1])/y, min(rect[2], 90.0 - rect[2])
         rect = ((rect[0][0]/y, rect[0][1]/x), (rect[1][0]/y, rect[1][1]/x), rect[2]) # normalizes crop for different sized images
 
         if self.iterative_crop:
-            if min(ratio_x, ratio_y) < self.min_crop_ratio:
+            if min(ratio_x, ratio_y) < self.min_crop_ratio or rotation > self.max_rotation:
                 self.light_threshold += 1
                 logger.info(f"{self.filename} {(ratio_x, ratio_y)} wrong crop, increasing light threshold to {self.light_threshold}")
                 return self.find_optimal_crop(is_increasing = True)
 
-            if max(ratio_x, ratio_y) > self.max_crop_ratio or rect[2] > self.max_rotation and rect[2] < 90 - self.rotation:
+            if max(ratio_x, ratio_y) > self.max_crop_ratio:
                 if not is_increasing:
                     self.light_threshold -= 1
-                    logger.info(f"{self.filename} {(ratio_x, ratio_y)} wrong crop, decreasing light threshold to {self.light_threshold}")
+                    logger.info(f"{self.filename} {(ratio_x, ratio_y, rotation)} wrong crop, decreasing light threshold to {self.light_threshold}")
                     return self.find_optimal_crop()
                 else:
-                    logger.warning(f"{self.filename} still wrong crop {(ratio_x, ratio_y)}")
+                    logger.warning(f"{self.filename} still wrong crop {(ratio_x, ratio_y, rotation)}")
                     if self.skip_wrong_crop:
                         self.film_type = 3
 
-            logger.info(f"{self.filename} final crop {(ratio_x, ratio_y)}")
+            logger.info(f"{self.filename} final crop {(ratio_x, ratio_y, rotation)}")
 
         return thresh, rect, largest_contour
     
