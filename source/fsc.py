@@ -46,7 +46,16 @@ presets = {
     },
     'b/w_auto': {
         'film_type': 0,
-        'border_crop': 3,
+        'border_crop': 1,
+        'rotation': 2,
+        'ignore_border': (3, 3),
+        'skip_wrong_crop': True,
+        'filetype': 'JPG',
+        'remove_dust': True
+    },
+    'b/w_crop': {
+        'film_type': 3,
+        'border_crop': 2,
         'rotation': 2,
         'ignore_border': (3, 3),
         'skip_wrong_crop': True,
@@ -73,7 +82,12 @@ def process_file(params):
     photo.load(full_res=True)
     photo.process(full_res=True)
     base_name, _ = os.path.splitext(filename)
-    photo.export(os.path.join(target, base_name))
+    file_path = os.path.join(target, base_name)
+    photo.export(file_path)
+
+    # adjust file timestamp to match the original file
+    creation_time = os.path.getctime(file)
+    os.utime(f"{file_path}.{settings['filetype']}", (creation_time, creation_time))
 
 if __name__ == "__main__":
     # Set up command-line argument parsing
